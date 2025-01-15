@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panda App Interface with Updates</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #4a4a4a;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: url('https://v0.dev/placeholder.svg?height=300&width=300');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        .container {
+            width: 300px;
+            background-color: rgba(74, 74, 74, 0.9);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+        }
+        .header-item {
+            background-color: #ffc107;
+            border-radius: 15px;
+            padding: 10px;
+            width: 30%;
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.8em;
+            cursor: pointer;
+        }
+        .panda-image {
+            width: 100%;
+            height: 300px;
+            background-image: url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/photo_2024-09-11_01-12-53-jDN3Tc2qebiEfI3B9dHA2q6l0g2HKZ.jpg');
+            background-size: cover;
+            background-position: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+        .panda-image:hover {
+            transform: scale(1.05);
+        }
+        .buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            padding: 10px;
+        }
+        .button {
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 10px;
+            width: 45%;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 300px;
+            border-radius: 15px;
+            text-align: center;
+        }
+        .close {
+            color: #aaa;
+            float: left;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        #invitePage {
+            display: none;
+            background-color: rgba(74, 74, 74, 0.9);
+            padding: 20px;
+            border-radius: 20px;
+            text-align: center;
+            color: white;
+        }
+        #inviteLink {
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        .transfer-coins input {
+            width: 90%;
+            padding: 5px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .transfer-coins button {
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            margin-top: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-item" id="coinCount">سکه ها: 0</div>
+            <div class="header-item" id="transferCoinsButton">انتقال سکه</div>
+            <div class="header-item">نام کاربر: @user</div>
+        </div>
+        <div class="panda-image"></div>
+        <div class="buttons">
+            <button class="button" id="challengesButton">چالش ها</button>
+            <button class="button" id="gamesButton">بازی ها</button>
+            <button class="button" id="coinRateButton">نرخ سکه (امروز)</button>
+            <button class="button" id="marketplaceButton">تجارتخانه</button>
+            <button class="button" id="invitesButton">دعوت ها</button>
+        </div>
+    </div>
+
+    <div id="gameModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>بازی حدس عدد</h2>
+            <p>یک عدد بین 1 تا 100 حدس بزنید:</p>
+            <input type="number" id="guessInput" min="1" max="100">
+            <button onclick="checkGuess()">حدس بزن</button>
+            <p id="result"></p>
+            <p id="gameReward"></p>
+        </div>
+    </div>
+
+    <div id="challengesModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>چالش ها</h2>
+            <p>این بخش در حال ساخت است</p>
+        </div>
+    </div>
+
+    <div id="coinRateModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>نرخ سکه</h2>
+            <p>هزار سکه = ۱۰ تومان</p>
+            <p>دو هزار سکه = ۲۵ تومان</p>
+            <p>پنج هزار سکه = ۵۰ تومان</p>
+            <p>ده هزار سکه = ۱۲۰ تومان</p>
+            <p>برای بقیه نرخ ها به پشتیبانی مراجعه کنید</p>
+        </div>
+    </div>
+
+    <div id="marketplaceModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>تجارتخانه</h2>
+            <p>آیا میخواهید به تجارتخانه ملحق شوید؟</p>
+            <button id="joinMarketplace">بله</button>
+            <button id="cancelMarketplace">خیر</button>
+        </div>
+    </div>
+
+    <div id="transferCoinsModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>انتقال سکه</h2>
+            <p>شناسه ی فرد مورد را وارد کنید و سپس تعداد سکه ای که میخواهید به حسابش واریز کنید را وارد کنید</p>
+            <div class="transfer-coins">
+                <input type="text" id="recipientId" placeholder="شناسه فرد مورد نظر">
+                <input type="number" id="transferAmount" placeholder="تعداد سکه مورد نظر">
+                <button onclick="transferCoins()">انتقال</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="invitePage">
+        <h2>دعوت ها</h2>
+        <p>با دعوت هر فرد ۱۲۰ سکه رایگان دریافت کنید</p>
+        <p>تعداد دعوت ها: <span id="inviteCount">0</span></p>
+        <button id="inviteLink">کپی لینک دعوت</button>
+    </div>
+
+    <script>
+        const gameModal = document.getElementById("gameModal");
+        const challengesModal = document.getElementById("challengesModal");
+        const coinRateModal = document.getElementById("coinRateModal");
+        const marketplaceModal = document.getElementById("marketplaceModal");
+        const transferCoinsModal = document.getElementById("transferCoinsModal");
+        const invitePage = document.getElementById("invitePage");
+        const container = document.querySelector(".container");
+
+        const gamesButton = document.getElementById("gamesButton");
+        const challengesButton = document.getElementById("challengesButton");
+        const coinRateButton = document.getElementById("coinRateButton");
+        const marketplaceButton = document.getElementById("marketplaceButton");
+        const invitesButton = document.getElementById("invitesButton");
+        const transferCoinsButton = document.getElementById("transferCoinsButton");
+
+        const closeButtons = document.getElementsByClassName("close");
+        const joinMarketplaceButton = document.getElementById("joinMarketplace");
+        const cancelMarketplaceButton = document.getElementById("cancelMarketplace");
+        const inviteLinkButton = document.getElementById("inviteLink");
+
+        let randomNumber = Math.floor(Math.random() * 100) + 1;
+        let attempts = 0;
+        let gameReward = 150;
+        let totalCoins = 0;
+
+        function openModal(modal) {
+            modal.style.display = "block";
+        }
+
+        function closeModal(modal) {
+            modal.style.display = "none";
+        }
+
+        function closeAllModals() {
+            gameModal.style.display = "none";
+            challengesModal.style.display = "none";
+            coinRateModal.style.display = "none";
+            marketplaceModal.style.display = "none";
+            transferCoinsModal.style.display = "none";
+            invitePage.style.display = "none";
+            container.style.display = "block";
+        }
+
+        function updateCoinCount() {
+            document.getElementById("coinCount").textContent = `سکه ها: ${totalCoins}`;
+        }
+
+        gamesButton.onclick = function() {
+            openModal(gameModal);
+            gameReward = 150;
+            document.getElementById("gameReward").textContent = `جایزه فعلی: ${gameReward} سکه`;
+        }
+
+        challengesButton.onclick = function() {
+            openModal(challengesModal);
+        }
+
+        coinRateButton.onclick = function() {
+            openModal(coinRateModal);
+        }
+
+        marketplaceButton.onclick = function() {
+            openModal(marketplaceModal);
+        }
+
+        transferCoinsButton.onclick = function() {
+            openModal(transferCoinsModal);
+        }
+
+        invitesButton.onclick = function() {
+            container.style.display = "none";
+            invitePage.style.display = "block";
+        }
+
+        for (let closeButton of closeButtons) {
+            closeButton.onclick = function() {
+                closeAllModals();
+            }
+        }
+
+        joinMarketplaceButton.onclick = function() {
+            // Replace this with the actual marketplace link
+            window.location.href = "https://example.com/marketplace";
+        }
+
+        cancelMarketplaceButton.onclick = function() {
+            closeModal(marketplaceModal);
+        }
+
+        inviteLinkButton.onclick = function() {
+            // Replace this with the actual invite link
+            const inviteLink = "https://example.com/invite";
+            navigator.clipboard.writeText(inviteLink).then(function() {
+                alert("لینک دعوت کپی شد!");
+            }, function(err) {
+                console.error('خطا در کپی کردن لینک: ', err);
+            });
+        }
+
+        window.onclick = function(event) {
+            if (event.target == gameModal || event.target == challengesModal || 
+                event.target == coinRateModal || event.target == marketplaceModal ||
+                event.target == transferCoinsModal) {
+                closeAllModals();
+            }
+        }
+
+        function checkGuess() {
+            const guess = document.getElementById("guessInput").value;
+            const result = document.getElementById("result");
+            const gameRewardElement = document.getElementById("gameReward");
+            attempts++;
+
+            if (guess == randomNumber) {
+                result.textContent = `آفرین! شما در ${attempts} تلاش عدد را حدس زدید.`;
+                totalCoins += gameReward;
+                updateCoinCount();
+                gameRewardElement.textContent = `شما ${gameReward} سکه برنده شدید!`;
+                randomNumber = Math.floor(Math.random() * 100) + 1;
+                attempts = 0;
+                gameReward = 150;
+            } else {
+                if (guess < randomNumber) {
+                    result.textContent = "کم است! یک عدد بزرگتر را امتحان کنید.";
+                } else {
+                    result.textContent = "زیاد است! یک عدد کوچکتر را امتحان کنید.";
+                }
+                gameReward = Math.max(0, gameReward - 10);
+                gameRewardElement.textContent = `جایزه فعلی: ${gameReward} سکه`;
+            }
+        }
+
+        function transferCoins() {
+            const recipientId = document.getElementById("recipientId").value;
+            const transferAmount = parseInt(document.getElementById("transferAmount").value);
+
+            if (recipientId && transferAmount && transferAmount > 0 && transferAmount <= totalCoins) {
+                totalCoins -= transferAmount;
+                updateCoinCount();
+                alert(`${transferAmount} سکه به کاربر ${recipientId} منتقل شد.`);
+                closeModal(transferCoinsModal);
+            } else {
+                alert("لطفاً مقادیر معتبر وارد کنید یا مطمئن شوید که سکه کافی دارید.");
+            }
+        }
+
+        updateCoinCount();
+    </script>
+</body>
+</html>
